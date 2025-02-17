@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Simple</title>
+</head>
+<body>
+<div id="mensajes"></div>
+<input type="text" id="mensaje" placeholder="Escribe tu mensaje">
+<button onclick="enviarMensaje()">Enviar</button>
+
+<script>
+  const socket = new WebSocket('ws://localhost:8080/chat');
+  const mensajesDiv = document.getElementById('mensajes');
+
+  socket.onmessage = (event) => {
+      mensajesDiv.innerHTML += `<p>${event.data}</p>`;
+  };
+
+  function enviarMensaje() {
+      const input = document.getElementById('mensaje');
+      socket.send(input.value);
+      input.value = '';
+  }
+</script>
+</body>
+</html>
