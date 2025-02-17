@@ -1,0 +1,59 @@
+<html>
+
+<head></head>
+
+<body>
+
+<div id=mensajes></div>
+
+<input  type="text"  id="mensaje"  >
+
+<button  onclick="sendMessage()"  >sdas</button>
+
+
+
+<script>  
+
+let socket =new WebSocket("http://localhost:8080/cuenta");
+
+socket.onmessage=function(event){
+
+	let data=event.data
+
+	
+
+	let n=document.getElementById("mensajes");
+
+	n.innerHTML+='<p>'+data+'<p>';
+
+	}
+
+
+
+function sendMessage(){
+
+	
+
+	let num=document.getElementById("mensaje").value;
+
+	socket.send(num);
+
+	
+
+	
+
+}
+
+
+
+
+
+
+
+</script>
+
+</body>
+
+
+
+</html>
