@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat de Conexión</title>
+    <style>
+        #messages {
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 300px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formulario de Conexión</h1>
+    <div>
+        <label for="email">Email:</label>
+        <input type="text" id="email" />
+        <label for="password">Clave:</label>
+        <input type="password" id="password" />
+        <button id="loginButton">Conectar</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <script>
+        var socket;
+        var messagesElement = document.getElementById('messages');
+        var loginButton = document.getElementById('loginButton');
+        var emailInput = document.getElementById('email');
+        var passwordInput = document.getElementById('password');
+
+        // Conectar al servidor WebSocket
+        function connect() {
+            socket = new WebSocket('ws://localhost:8080/chat');
+
+            socket.onopen = function () {
+                console.log('Conexión establecida');
+            };
+
+            socket.onmessage = function (event) {
+                var message = event.data;
+                var div = document.createElement('div');
+                div.textContent = message;
+                messagesElement.appendChild(div);
+                messagesElement.scrollTop = messagesElement.scrollHeight; // Desplazarse hacia abajo
+            };
+
+            socket.onclose = function () {
+                console.log('Conexión cerrada');
+            };
+
+            socket.onerror = function (error) {
+                console.log('Error en la conexión', error);
+            };
+        }
+
+        loginButton.addEventListener('click', function () {
+            var email = emailInput.value;
+            var password = passwordInput.value;
+
+            // Enviar el mensaje de conexión
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(email + ":" + password);
+            }
+        });
+
+        // Al cargar la página, conectamos al WebSocket
+        window.onload = connect;
+    </script>
+</body>
+</html>
