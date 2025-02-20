@@ -7,6 +7,7 @@ import java.util.*;
 
 public class ChatHandler extends TextWebSocketHandler {
     private Map<WebSocketSession, String> usuarios = new HashMap<>();
+    private List<String> historialMensajes = new ArrayList<>();
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -16,6 +17,7 @@ public class ChatHandler extends TextWebSocketHandler {
         if (!usuarios.containsKey(session)) {
             usuarios.put(session, mensaje); //Guardo el nombre de la persona que se conecta por primera vez
             broadcast("Bienvenido " + mensaje + "!");
+            sendHistorial(session);
             return;
         }
 
@@ -30,7 +32,20 @@ public class ChatHandler extends TextWebSocketHandler {
 
         // Mensaje normal
         String nombre = usuarios.get(session);
-        broadcast(nombre + ": " + mensaje);
+        String mensajeConNombre = (nombre + ": " + mensaje);
+        
+
+        // Guardamos el mensaje en el historial
+        historialMensajes.add(mensajeConNombre);
+        
+        // Enviamos el mensaje a todos los usuarios conectados
+        broadcast(mensajeConNombre);
+    }
+    
+    private void sendHistorial (WebSocketSession session) throws Exception {
+    	for(String mensaje : historialMensajes) {
+    		session.sendMessage(new TextMessage(mensaje));
+    	}
     }
 
     private void broadcast(String mensaje) throws Exception {
